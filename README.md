@@ -1,4 +1,4 @@
-# WEB103 Project 3 - *Name of App Here*
+# WEB103 Project 3 
 
 Submitted by: **Huyen Huynh**
 
