@@ -1,58 +1,42 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import '../css/Event.css'
 
 const Event = (props) => {
+    const dateTime = props.date && props.time ? new Date(`${props.date}T${props.time}`) : null
 
-    const [event, setEvent] = useState([])
-    const [time, setTime] = useState([])
-    const [remaining, setRemaining] = useState([])
+    const formattedTime = dateTime
+        ? dateTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+        : ''
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const eventData = await EventsAPI.getEventsById(props.id)
-                setEvent(eventData)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [])
+    const remaining = dateTime
+        ? (() => {
+              const ms = dateTime.getTime() - Date.now()
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const result = await dates.formatTime(event.time)
-                setTime(result)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
+              if (ms <= 0) {
+                  return 'Event started'
+              }
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const timeRemaining = await dates.formatRemainingTime(event.remaining)
-                setRemaining(timeRemaining)
-                dates.formatNegativeTimeRemaining(remaining, event.id)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
+              const days = Math.floor(ms / (1000 * 60 * 60 * 24))
+              const hours = Math.floor((ms / (1000 * 60 * 60)) % 24)
+
+              if (days > 0) {
+                  return `${days}d ${hours}h remaining`
+              }
+
+              const minutes = Math.floor((ms / (1000 * 60)) % 60)
+              return `${hours}h ${minutes}m remaining`
+          })()
+        : ''
 
     return (
         <article className='event-information'>
-            <img src={event.image} />
+            <img src={props.image} />
 
             <div className='event-information-overlay'>
                 <div className='text'>
-                    <h3>{event.title}</h3>
-                    <p><i className="fa-regular fa-calendar fa-bounce"></i> {event.date} <br /> {time}</p>
-                    <p id={`remaining-${event.id}`}>{remaining}</p>
+                    <h3>{props.title}</h3>
+                    <p><i className="fa-regular fa-calendar fa-bounce"></i> {props.date} <br /> {formattedTime}</p>
+                    <p id={`remaining-${props.id}`}>{remaining}</p>
                 </div>
             </div>
         </article>
